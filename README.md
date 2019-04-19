@@ -1,5 +1,5 @@
 Run command
 
 ```
-docker run -it --privileged --net=host andresmontoyain/WIFIRock bash
+sudo docker run -i -t --network="host" --privileged andresmontoyain/WIFIRock bash
 ```
