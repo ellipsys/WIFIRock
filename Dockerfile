@@ -1,73 +1,76 @@
-FROM debian
+FROM python:2.7.16-jessie
 
+ENV DEBIAN_FRONTEND noninteractive
 ENV HASHCAT_VERSION hashcat-5.1.0
-ENV HASHCAT_UTILS_VERSION  1.9
+ENV HASHCAT_UTILS_VERSION 1.9
+ENV TERM xterm
 
 # Update requirements
+RUN echo "deb-src http://deb.debian.org/debian jessie main" >> /etc/apt/sources.list
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install python python3-pip python3 python-dev ca-certificates gcc openssl make kmod nano wget p7zip build-essential libsqlite3-dev libpcap0.8-dev libpcap-dev sqlite3 pkg-config libnl-genl-3-dev libssl-dev net-tools iw ethtool usbutils pciutils wireless-tools git curl wget unzip macchanger tshark wireshark -y
+RUN apt-get install python3 xterm software-properties-common gawk psmisc isc-dhcp-server zenity binutils hostapd lighttpd ca-certificates gcc php5-cgi php5-common  openssl make kmod nano wget p7zip build-essential libsqlite3-dev libpcap0.8-dev libpcap-dev sqlite3 pkg-config libnl-genl-3-dev libssl-dev net-tools iw ethtool usbutils pciutils wireless-tools git curl wget unzip macchanger tshark pyrit wireshark nmap -y
 RUN apt-get build-dep aircrack-ng -y
 
-# Install pyrit
-RUN RUN git clone https://github.com/JPaulMora/Pyrit.git
-WORKDIR /Pyrit/
-RUN pip install psycopg2
-RUN apt-get install python-scapy
-RUN python setup.py clean
-RUN python setup.py build
-RUN python setup.py install
+# Workdir /app/
+WORKDIR /app/
 
-# Workdir /
-WORKDIR /
+# Install mkd3
+RUN git clone https://github.com/wi-fi-analyzer/mdk3-master.git
+WORKDIR /app/mdk3-master/
+RUN make
+RUN make install
+
+# Workdir /app/
+WORKDIR /app/
 
 # Install Aircrack from Source
 RUN wget https://download.aircrack-ng.org/aircrack-ng-1.5.2.tar.gz
 RUN tar xzvf aircrack-ng-1.5.2.tar.gz
-WORKDIR /aircrack-ng-1.5.2/
+WORKDIR /app/aircrack-ng-1.5.2/
 RUN autoreconf -i
 RUN ./configure --with-experimental
 RUN make
 RUN make install
 RUN airodump-ng-oui-update
 
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
 
 # Install wps-pixie
 RUN git clone https://github.com/wiire/pixiewps
-WORKDIR /pixiewps/
+WORKDIR /app/pixiewps/
 RUN make
 RUN make install
 
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
 
 # Install hcxdump
 RUN git clone https://github.com/ZerBea/hcxdumptool.git
-WORKDIR /hcxdumptool/
+WORKDIR /app/hcxdumptool/
 RUN make
 RUN make install
 
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
 
 # Install hcxtools
 RUN git clone https://github.com/ZerBea/hcxtools.git
-WORKDIR /hcxtools/
+WORKDIR /app/hcxtools/
 RUN make
 RUN make install
 
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
 
 # Install bully
 RUN git clone https://github.com/aanarchyy/bully
-WORKDIR /bully/src/
+WORKDIR /app/bully/src/
 RUN make
 RUN make install
 
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
 
 #Install and configure hashcat
 RUN mkdir /hashcat
@@ -87,56 +90,54 @@ RUN cd /hashcat && \
 RUN ln -s /hashcat/${HASHCAT_VERSION}/hashcat64.bin /usr/bin/hashcat
 RUN ln -s /hashcat/hashcat-utils-${HASHCAT_UTILS_VERSION}/bin/cap2hccapx.bin /usr/bin/cap2hccapx
 
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
 
 # Install reaver
 RUN git clone https://github.com/gabrielrcouto/reaver-wps.git
-WORKDIR /reaver-wps/src/
+WORKDIR /app/reaver-wps/src/
 RUN ./configure
 RUN make
 RUN make install
 
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
 
 # Install cowpatty
 RUN git clone https://github.com/roobixx/cowpatty.git
-WORKDIR /cowpatty/
+WORKDIR /app/cowpatty/
 RUN make
 
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
 
 # Install wifite
 RUN git clone https://github.com/derv82/wifite2.git
-RUN chmod -R 777 /wifite2/
-WORKDIR /wifite2/
+RUN chmod -R 777 /app/wifite2/
+WORKDIR /app/wifite2/
 RUN apt-get install rfkill -y
 
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
 
-# Install fluxion
-WORKDIR /fluxion/
-RUN wget https://raw.githubusercontent.com/FluxionNetwork/fluxion/master/install/install.sh && bash install.sh
+# Cloning fluxion
+RUN git clone https://github.com/wi-fi-analyzer/fluxion.git
+RUN chmod -R 777 /app/fluxion/
 
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
 
 # Install wps-scripts
 RUN git clone https://github.com/0x90/wps-scripts.git
-RUN chmod -R 777 /wps-scripts/
-WORKDIR /wps-scripts/
+RUN chmod -R 777 /app/wps-scripts/
+WORKDIR /app/wps-scripts/
 
-# Workdir /
-WORKDIR /
+# clean / optimise docker size
+RUN apt-get autoremove -y
+RUN apt-get clean
+RUN apt-get autoclean
+RUN rm -rf /var/lib/apt/lists/*
+RUN rm -rf /tmp/* /var/tmp/*
 
-# Install Beef
-RUN git clone https://github.com/beefproject/beef.git
-RUN chmod -R 777 /beef/
-WORKDIR /beef/
-RUN ./install
-
-# Workdir /
-WORKDIR /
+# Workdir /app/
+WORKDIR /app/
