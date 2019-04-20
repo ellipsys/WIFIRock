@@ -23,7 +23,7 @@ This Docker container has the next tools:
 Running command
 
 ```
-docker run -it --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:ro --privileged --network=host --name wifirock andresmontoyain/wifirock bash
+docker run -it --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:ro --privileged --network=host --name wifirock andresmontoyain/wifirock bash
 ```
 
 ## More tools!
