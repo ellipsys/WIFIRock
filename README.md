@@ -30,7 +30,7 @@ sudo docker run -it --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:ro --privil
 
 Do you want to add more tools in this project? Write me or do a pull request!
 
-In the case of [Bettercap](https://github.com/bettercap/bettercap), this tool has its own Dockerfile config and its optimized nicely!
+In the case of [Bettercap](https://github.com/bettercap/bettercap), this tool has its own Dockerfile config and is optimized nicely!
 
 ## Contact
 
